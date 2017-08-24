@@ -1,5 +1,5 @@
 /*
-Copyright 2017, Fr Capgemini, R. Mauget/JF. Hubler
+Copyright 2017, FRANCE (DGA/Capgemini)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ import nato.ivct.etc.fr.fctt_common.utils.TextInternationalization;
 import org.slf4j.Logger;
 
 /**
- * @author Fr Capgemini, R. Mauget/JF. Hubler
+ * @author FRANCE (DGA/Capgemini)
  */
 public class HLA_Services_BaseModel extends IVCT_BaseModel {
 
@@ -100,7 +100,6 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
     private AttributeHandle         federateHandleId;
 
     private AttributeHandle         federationRTIVersionId;
-    private boolean					RTImak = false;
     
 	// Interaction management
     private ParameterHandle 		serviceId;
@@ -175,7 +174,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
             federationRTIVersionId = ivct_rti.getAttributeHandle(federationId, "HLARTIversion");
         }
         catch (NameNotFound | FederateNotExecutionMember | NotConnected | RTIinternalError | InvalidObjectClassHandle ex) {
-            logger.debug("Cannot get object class handle");
+            logger.error("Cannot get object class handle");
             return true;
         }
         
@@ -191,7 +190,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
         	federationSet.add(federationRTIVersionId);
         }
         catch (FederateNotExecutionMember | NotConnected ex) {
-            logger.debug("Cannot build attribute set");
+            logger.error("Cannot build attribute set");
             return true;
         }
         
@@ -201,7 +200,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
             ivct_rti.subscribeObjectClassAttributes(federationId,federationSet);
         }
         catch (AttributeNotDefined | ObjectClassNotDefined | SaveInProgress | RestoreInProgress | FederateNotExecutionMember | NotConnected | RTIinternalError ex) {
-        	logger.debug("Cannot subscribe attributes");
+        	logger.error("Cannot subscribe attributes");
         	return true;
         }
         
@@ -214,7 +213,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
             successIndicatorId  = ivct_rti.getParameterHandle(reportServiceInvocationId, "HLAsuccessIndicator");
         }
     	catch (NameNotFound | FederateNotExecutionMember | NotConnected | RTIinternalError | InvalidInteractionClassHandle e) {
-	    	logger.debug("Cannot subscribe attributes");
+	    	logger.error("Cannot subscribe attributes");
 	    	return true;
 		}
 
@@ -236,7 +235,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 			reportingServiceId = ivct_rti.getInteractionClassHandle("HLAmanager.HLAfederate.HLAadjust.HLAsetServiceReporting");
 		}
 		catch (NameNotFound | FederateNotExecutionMember | NotConnected | RTIinternalError ex) {
-        	logger.debug("RTI internal error");
+        	logger.error("RTI internal error");
             return true;
 		}
 		
@@ -255,7 +254,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
             	reportingParameters = ivct_rti.getParameterHandleValueMapFactory().create(2);
             }
             catch (FederateNotExecutionMember | NotConnected | NameNotFound | InvalidInteractionClassHandle ex) {
-            	logger.debug("Cannot set interaction parameters");
+            	logger.error("Cannot set interaction parameters");
             	return true;
             }
             // Encode values
@@ -268,12 +267,12 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
                 ivct_rti.sendInteraction(reportingServiceId, reportingParameters, null);
             }
             catch (InteractionClassNotPublished | InteractionParameterNotDefined | InteractionClassNotDefined | SaveInProgress | RestoreInProgress | FederateNotExecutionMember | NotConnected | RTIinternalError ex) {
-            	logger.debug("Cannot send interaction");
+            	logger.error("Cannot send interaction");
             	return true;
             }
 		}
 		catch (FederateNotExecutionMember | NotConnected | RTIinternalError | FederateServiceInvocationsAreBeingReportedViaMOM | InteractionClassNotDefined | SaveInProgress | RestoreInProgress ex) {
-            logger.debug("Cannot get subscribe interaction class");
+            logger.error("Cannot get subscribe interaction class");
             return true;
 		}
 		// All ok
@@ -437,8 +436,8 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
      */
     private void doReceiveInteraction(final InteractionClassHandle interactionClass, final ParameterHandleValueMap theParameters) {
 
-    	logger.debug(String.format("Interaction : %s",interactionClass.toString()));
-    	logger.debug(String.format("Parameters : %s",theParameters.toString()));
+//    	logger.debug(String.format("Interaction : %s",interactionClass.toString()));
+//    	logger.debug(String.format("Parameters : %s",theParameters.toString()));
     	
     	try {
 			String interactionClassName = ivct_rti.getInteractionClassName(interactionClass);
@@ -457,16 +456,19 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 		    			final HLAunicodeString serviceDecoder = _encoderFactory.createHLAunicodeString();
 		    			serviceDecoder.decode(theParameters.get(serviceId));
 		    			String serviceName = serviceDecoder.getValue();
+//						logger.debug("serviceName: " + serviceName);
 		    			// Update services
 		    			HlaResultServicesModel.updateState(serviceName);
 					}
-				} catch (DecoderException e) {
-	                logger.debug("Failed to decode incoming attribute");
+				}
+	    		catch (DecoderException e) {
+	                logger.error("Failed to decode incoming attribute");
 	                return;
 	 			}
 			}
-		} catch (InvalidInteractionClassHandle | FederateNotExecutionMember	| NotConnected | RTIinternalError e) {
-            logger.debug("Failed to decode incoming attribute");
+		}
+    	catch (InvalidInteractionClassHandle | FederateNotExecutionMember	| NotConnected | RTIinternalError e) {
+            logger.error("Failed to decode incoming attribute");
             return;
 		}
     }
@@ -549,7 +551,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 				federateName = stringDecoder.getValue();
 				
 			} catch (DecoderException e) {
-                logger.debug("Failed to decode incoming attribute");
+                logger.error("Failed to decode incoming attribute");
                 return;
  			}
     	}
@@ -559,7 +561,7 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 
     	if ((federateName.equals(sutName)) && (federateHandle != null)) {
 			if (needToFollowFederate(federateHandle) == false) {
-	            logger.debug("following federate " + sutName);
+	            logger.info("following federate " + sutName);
 	            sutHandle = federateHandle;
 	            // Force connect, create & join services validation
 	            HlaResultServicesModel.updateState("connect");
@@ -581,18 +583,9 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 				final String RTIversion = stringDecoder.getValue();
 				
 				logger.debug("RTI version = " + RTIversion);
-				
-				if (RTIversion.contains("MAK"))
-				{
-					logger.debug("RTI MAK");
-					RTImak = true;
-				}
-				else
-				{
-					logger.debug("RTI PITCH");
-				}
-			} catch (DecoderException e) {
-                logger.debug("Failed to decode incoming attribute");
+
+    		} catch (DecoderException e) {
+                logger.error("Failed to decode incoming attribute");
                 return;
  			}
     	}
