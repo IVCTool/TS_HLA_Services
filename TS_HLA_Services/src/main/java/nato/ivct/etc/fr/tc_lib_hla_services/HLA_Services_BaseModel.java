@@ -559,7 +559,9 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 			federateHandle = theAttributes.get(federateHandleId); 
     	}
 
-    	if ((federateName.equals(sutName)) && (federateHandle != null)) {
+// 2017/11/15 ETC FRA V1.3, Capgemini, to avoid several detections of federate to follow
+//    	if ((federateName.equals(sutName)) && (federateHandle != null)) {
+    	if ((sutHandle == null) && (federateName.equals(sutName)) && (federateHandle != null)) {
 			if (needToFollowFederate(federateHandle) == false) {
 	            logger.info("following federate " + sutName);
 	            sutHandle = federateHandle;
