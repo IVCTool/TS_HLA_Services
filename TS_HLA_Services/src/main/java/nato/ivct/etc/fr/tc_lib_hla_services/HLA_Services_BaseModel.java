@@ -306,23 +306,35 @@ public class HLA_Services_BaseModel extends IVCT_BaseModel {
 	    	String result;
 	    	result = saveResultsWriteHeader(lCurrentDate, eBuildResults.ServicesCertificated);
 	    	certifiedServicesResult.write(result);
-	    	logger.info(result);
+	    	// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// logger.info(result);
 	    	result = String.format(headerFormatter, "", TextInternationalization.getString("resultsFile.headerColumns.services"), "");
 	    	certifiedServicesResult.write(result);
-			logger.info(result);
+			// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// logger.info(result);
 	    	result = HlaResultServicesModel.writeResults(eBuildResults.ServicesCertificated, fileWriter, formatter).getString();
 	    	certifiedServicesResult.write(result);
-	    	logger.info(result);
+	    	// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// logger.info(result);
 	    	
 	    	result = saveResultsWriteHeader(lCurrentDate, eBuildResults.ServicesNotCertificated);
 	    	nonCertifiedServicesResult.write(result);
-	    	logger.info(result);
+	    	// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// logger.info(result);
 	    	result = String.format(headerFormatter, "", TextInternationalization.getString("resultsFile.headerColumns.services"), "");
 	    	nonCertifiedServicesResult.write(result);
-			logger.info(result);
+			// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// logger.info(result);
 	    	result = HlaResultServicesModel.writeResults(eBuildResults.ServicesNotCertificated, fileWriter, formatter).getString();
 	    	nonCertifiedServicesResult.write(result);
-	    	logger.info(result);
+	    	// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// logger.info(result);
+			
+			// 2018/01/09 ETC FRA 1.4, Capgemini, results not logged
+			// Log results filenames
+			logger.info(TextInternationalization.getString("etc_fra.lookAtResultsFiles")); 
+			logger.info(" - " + certifiedServicesResultFile.getAbsolutePath()); 
+			logger.info(" - " + nonCertifiedServicesResultFile.getAbsolutePath());
 		}
 		catch (Exception e) {
 			return false;
